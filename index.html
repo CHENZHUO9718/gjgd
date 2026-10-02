@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>表单记录</title>
+<script src="https://cdn.jsdelivr.net/npm/x-spreadsheet@0.9.9/dist/xspreadsheet.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/x-spreadsheet@0.9.9/dist/xspreadsheet.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>body{margin:0}#qrbox{padding:10px;text-align:center}</style>
+</head>
+<body>
+<div id="sheet"></div>
+<div id="qrbox"><div id="qrcode"></div><p>本页链接二维码（可右键保存）</p ></div>
+<script>
+const url=new URL(window.location);
+const id=url.searchParams.get("id")||"default";
+const storageKey="form_"+id;
+// 优先读本地缓存，无则初始化焊缝检查表
+let data=JSON.parse(localStorage.getItem(storageKey))||{sheets:[{name:"记录"+id,rows:[["编号","部位","焊工","探伤结果","备注"],[""+id,"","","",""]]}]};
+const x=new xspreadsheet("#sheet",{data:data});
+// 自动保存到浏览器本地
+x.on("cell-edited",()=>{localStorage.setItem(storageKey,JSON.stringify(x.getData()));});
+// 生成当前页二维码
+QRCode.toCanvas(document.getElementById("qrcode"),window.location.href,{width:180},err=>{if(err)console.error(err)});
+</script>
+</body>
+</html>
